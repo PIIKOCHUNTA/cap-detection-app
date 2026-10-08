@@ -1,5 +1,6 @@
 import streamlit as st
 import cv2
+from xlsxwriter import *
 from ultralytics import YOLO
 from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
 import os
@@ -41,14 +42,11 @@ class VideoProcessor(VideoTransformerBase):
             img = r.plot()
         return frame.from_ndarray(img, format="bgr24")
 
-# 4. ブラウザ上にリアルタイムカメラを設置（URLのフォーマットを最新に修正しました）
+# 4. ブラウザ上にリアルタイムカメラを設置（エラーの原因だった通信設定を丸ごと削除し、最もシンプルにしました）
 ctx = webrtc_streamer(
     key="cap-detection", 
     video_transformer_factory=VideoProcessor,
-    media_stream_constraints={"video": True, "audio": False},
-    rtc_configuration={
-        "iceServers": [{"urls": "stun:://google.com"}]
-    }
+    media_stream_constraints={"video": True, "audio": False}
 )
 
 # 5. スライダーの数値をリアルタイムにカメラ処理クラスへ届ける設定
