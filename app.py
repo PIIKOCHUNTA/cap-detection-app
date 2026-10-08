@@ -41,13 +41,13 @@ class VideoProcessor(VideoTransformerBase):
             img = r.plot()
         return frame.from_ndarray(img, format="bgr24")
 
-# 4. ブラウザ上にリアルタイムカメラを設置（インデントを完全に修正しました）
+# 4. ブラウザ上にリアルタイムカメラを設置（URLのフォーマットを最新に修正しました）
 ctx = webrtc_streamer(
     key="cap-detection", 
     video_transformer_factory=VideoProcessor,
     media_stream_constraints={"video": True, "audio": False},
     rtc_configuration={
-        "iceServers": [{"urls": ["stun:://google.com"]}]
+        "iceServers": [{"urls": "stun:://google.com"}]
     }
 )
 
