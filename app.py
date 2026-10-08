@@ -17,51 +17,40 @@ def load_model():
 
 model = load_model()
 
-# ==========================================
-# 💡 画面の左側（サイドバー）に信頼度の調整スライダーを設置
-# ==========================================
+# 2. 画面の左側（サイドバー）に信頼度の調整スライダーを設置
 conf_score = st.sidebar.slider(
     "AIの判定基準（厳しさ）を調整してください", 
     min_value=0.0, 
     max_value=1.0, 
-    value=0.5, # 初期の値
+    value=0.5, 
     step=0.05
 )
 st.sidebar.write("※数値を大きくするほど、あやしい枠が消えて厳しく判定します。")
 
 st.write("「Start」ボタンを押すとカメラが起動します。左側のスライダーでリアルタイムに枠の調整が可能です！")
 
-# 2. サーバー上で映像を1フレームずつ処理するクラス
+# 3. サーバー上で映像を1フレームずつ処理するクラス
 class VideoProcessor(VideoTransformerBase):
     def __init__(self):
         self.conf = 0.5
 
     def recv(self, frame):
-        # 映像をOpenCV形式（NumPy配列）に変換
         img = frame.to_ndarray(format="bgr24")
-        
-        # スライダーで変更された最新の信頼度(conf)を使ってAI検出
         results = model(img, conf=self.conf)
-        
-        # 検出結果のボックスを映像に描き込む
         for r in results:
             img = r.plot()
-            
         return frame.from_ndarray(img, format="bgr24")
 
-# 3. ブラウザ上にリアルタイムカメラを設置
-# --- app.py の一番最後の部分 ---
-
-# 3. ブラウザ上にリアルタイムカメラを設置
+# 4. ブラウザ上にリアルタイムカメラを設置（インデントを完全に修正しました）
 ctx = webrtc_streamer(
     key="cap-detection", 
-    video_transformer_factory=VideoProcessor, # ライブラリの仕様上ここはそのまま
-    media_stream_constraints={"video": True, "audio": False}
-)
+    video_transformer_factory=VideoProcessor,
+    media_stream_constraints={"video": True, "audio": False},
     rtc_configuration={
-        "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
+        "iceServers": [{"urls": ["stun:://google.com"]}]
     }
 )
-# 💡 【ここを修正！】古い video_transformer から最新の video_processor に変更
+
+# 5. スライダーの数値をリアルタイムにカメラ処理クラスへ届ける設定
 if ctx.video_processor:
     ctx.video_processor.conf = conf_score
