@@ -58,7 +58,10 @@ ctx = webrtc_streamer(
     video_transformer_factory=VideoProcessor, # ライブラリの仕様上ここはそのまま
     media_stream_constraints={"video": True, "audio": False}
 )
-
+    rtc_configuration={
+        "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
+    }
+)
 # 💡 【ここを修正！】古い video_transformer から最新の video_processor に変更
 if ctx.video_processor:
     ctx.video_processor.conf = conf_score
