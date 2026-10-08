@@ -50,12 +50,15 @@ class VideoProcessor(VideoTransformerBase):
         return frame.from_ndarray(img, format="bgr24")
 
 # 3. ブラウザ上にリアルタイムカメラを設置
+# --- app.py の一番最後の部分 ---
+
+# 3. ブラウザ上にリアルタイムカメラを設置
 ctx = webrtc_streamer(
     key="cap-detection", 
-    video_transformer_factory=VideoProcessor,
+    video_transformer_factory=VideoProcessor, # ライブラリの仕様上ここはそのまま
     media_stream_constraints={"video": True, "audio": False}
 )
 
-# 💡 スライダーの数値をリアルタイムにカメラ処理クラスへ届ける設定
-if ctx.video_transformer:
-    ctx.video_transformer.conf = conf_score
+# 💡 【ここを修正！】古い video_transformer から最新の video_processor に変更
+if ctx.video_processor:
+    ctx.video_processor.conf = conf_score
